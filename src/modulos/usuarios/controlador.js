@@ -27,6 +27,20 @@ async function agregar(data) {
   }
 }
 
+async function actualizar(id, data) {
+    try {
+      const datoExistente = await db.uno(TABLA, id);
+      if (!datoExistente) {
+        throw new Error(`El dato con ID ${id} no existe`);
+      }
+  
+      const filasAfectadas = await db.actualizar(TABLA, id, data);
+      return filasAfectadas;
+    } catch (error) {
+      throw new Error(`Error al actualizar el dato con ID ${id}: ${error.message}`);
+    }
+  }
+
 async function eliminar(id) {
   try {
     const usuarioExistente = await db.uno(TABLA, id);
@@ -45,5 +59,6 @@ module.exports = {
   todos,
   uno,
   agregar,
+  actualizar,
   eliminar,
 };

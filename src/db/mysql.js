@@ -58,6 +58,15 @@ async function agregar(tabla, data) {
   }
 }
 
+async function actualizar(tabla, id, data) {
+    try {
+      const [result] = await connection.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
+      return result.affectedRows;
+    } catch (error) {
+      throw new Error(`Error al actualizar el registro con ID ${id} de la tabla ${tabla}: ${error.message}`);
+    }
+  }  
+
 async function eliminar(tabla, id) {
   try {
     const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
@@ -71,5 +80,6 @@ module.exports = {
   todos,
   uno,
   agregar,
+  actualizar,
   eliminar,
 };
