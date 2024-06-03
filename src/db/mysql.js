@@ -33,23 +33,40 @@ async function connectDB() {
 connectDB();
 
 async function todos(tabla) {
-  const [rows] = await connection.query(`SELECT * FROM ${tabla}`);
-  return rows;
+  try {
+    const [rows] = await connection.query(`SELECT * FROM ${tabla}`);
+    return rows;
+  } catch (error) {
+    throw new Error(`Error al obtener todos los registros de la tabla ${tabla}: ${error.message}`);
+  }
 }
 
 async function uno(tabla, id) {
-  const [rows] = await connection.query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
-  return rows[0];
-}
-
-async function agregar(tabla, data) {
-  const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
-  return result.insertId;
+  try {
+    const [rows] = await connection.query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
+    return rows[0];
+  } catch (error) {
+    throw new Error(`Error al obtener el registro con id ${id} de la tabla ${tabla}: ${error.message}`);
+  }
 }
 
 async function eliminar(tabla, id) {
-  const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
-  return result.affectedRows;
+    try {
+      const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
+      return result.affectedRows;
+    } catch (error) {
+      throw new Error(`Error al eliminar el registro con ID ${id} de la tabla ${tabla}: ${error.message}`);
+    }
+  }
+  
+
+async function agregar(tabla, data) {
+  try {
+    const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
+    return result.insertId;
+  } catch (error) {
+    throw new Error(`Error al agregar un nuevo registro a la tabla ${tabla}: ${error.message}`);
+  }
 }
 
 module.exports = {

@@ -1,14 +1,20 @@
 const express = require('express');
+const morgan = require('morgan');
 const config = require('./config');
 
-const clientes = require('./modulos/usuarios/rutas')
+const clientes = require('./modulos/usuarios/rutas');
 
 const app = express();
 
-//Configuración
-app.set('port', config.app.port)
+// Middleware
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}));
 
-//rutas
-app.use('/usuarios', clientes)
+// Configuración
+app.set('port', config.app.port);
 
-module.exports = app
+// Rutas
+app.use('/usuarios', clientes);
+
+module.exports = app;
