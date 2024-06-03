@@ -21,22 +21,18 @@ async function uno(id) {
 }
 
 async function eliminar(id) {
-    try {
-      // Verificar si el usuario existe antes de eliminarlo
-      const usuarioExistente = await db.uno(TABLA, id);
-      if (!usuarioExistente) {
-        throw new Error(`El usuario con ID ${id} no existe`);
-      }
-  
-      // Realizar la eliminación del usuario
-      const filasAfectadas = await db.eliminar(TABLA, id);
-      return filasAfectadas;
-    } catch (error) {
-      throw new Error(`Error al eliminar el usuario con ID ${id}: ${error.message}`);
+  try {
+    const usuarioExistente = await db.uno(TABLA, id);
+    if (!usuarioExistente) {
+      throw new Error(`El usuario con ID ${id} no existe`);
     }
-  }
 
-  
+    const filasAfectadas = await db.eliminar(TABLA, id);
+    return filasAfectadas;
+  } catch (error) {
+    throw new Error(`Error al eliminar el usuario con ID ${id}: ${error.message}`);
+  }
+}
 
 module.exports = {
   todos,
