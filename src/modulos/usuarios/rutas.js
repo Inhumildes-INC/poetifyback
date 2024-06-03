@@ -5,9 +5,10 @@ const router = express.Router();
 
 router.get('/', todos);
 router.get('/:id', uno);
-router.delete('/', eliminar); 
+router.post('/', agregar);
+router.delete('/', eliminar);
 
-async function todos (req, res) {
+async function todos(req, res) {
   try {
     const items = await controlador.todos();
     respuestas.success(req, res, items, 200);
@@ -16,7 +17,7 @@ async function todos (req, res) {
   }
 }
 
-async function uno (req, res) {
+async function uno(req, res) {
   try {
     const items = await controlador.uno(req.params.id);
     if (!items) {
@@ -29,7 +30,17 @@ async function uno (req, res) {
   }
 }
 
-async function eliminar (req, res, next) {
+async function agregar(req, res, next) {
+  try {
+    const data = req.body;
+    const nuevoUsuarioId = await controlador.agregar(data);
+    respuestas.success(req, res, `Usuario agregado con ID ${nuevoUsuarioId}`, 201);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function eliminar(req, res, next) {
   try {
     const { id } = req.body; // Leer ID desde el cuerpo de la solicitud
     if (!id) {
@@ -42,7 +53,7 @@ async function eliminar (req, res, next) {
       respuestas.success(req, res, `Usuario con ID ${id} eliminado exitosamente`, 200);
     }
   } catch (err) {
-    next(err); // Asegúrate de pasar el error a next
+    next(err);
   }
 }
 

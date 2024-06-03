@@ -14,9 +14,16 @@ async function uno(id) {
   try {
     return await db.uno(TABLA, id);
   } catch (error) {
-    throw new Error(
-      `Error al obtener el usuario con id ${id}: ${error.message}`
-    );
+    throw new Error(`Error al obtener el usuario con id ${id}: ${error.message}`);
+  }
+}
+
+async function agregar(data) {
+  try {
+    const nuevoId = await db.agregar(TABLA, data);
+    return nuevoId;
+  } catch (error) {
+    throw new Error(`Error al agregar el nuevo usuario: ${error.message}`);
   }
 }
 
@@ -37,5 +44,6 @@ async function eliminar(id) {
 module.exports = {
   todos,
   uno,
+  agregar,
   eliminar,
 };
