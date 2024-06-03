@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.get('/', todos);
 router.get('/:id', uno);
-router.put('/:id', eliminar); // Considera cambiar a DELETE
+router.delete('/', eliminar); 
 
-async function todos(req, res) {
+async function todos (req, res) {
   try {
     const items = await controlador.todos();
     respuestas.success(req, res, items, 200);
@@ -16,7 +16,7 @@ async function todos(req, res) {
   }
 }
 
-async function uno(req, res) {
+async function uno (req, res) {
   try {
     const items = await controlador.uno(req.params.id);
     if (!items) {
@@ -29,9 +29,12 @@ async function uno(req, res) {
   }
 }
 
-async function eliminar(req, res, next) {
+async function eliminar (req, res, next) {
   try {
-    const { id } = req.params;
+    const { id } = req.body; // Leer ID desde el cuerpo de la solicitud
+    if (!id) {
+      return respuestas.error(req, res, 'ID del usuario es requerido', 400);
+    }
     const eliminados = await controlador.eliminar(id);
     if (eliminados === 0) {
       respuestas.error(req, res, 'El usuario no existe o ya ha sido eliminado', 404);
