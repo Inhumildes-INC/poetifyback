@@ -1,12 +1,12 @@
 const express = require('express');
 const respuestas = require('../../red/respuestas');
-const controlador = require('./controlador');
+const controlador = require('./index'); // Importa el controlador correctamente
 const router = express.Router();
 
 router.get('/', todos);
-router.post('/buscar', uno);
+router.post('/buscar', buscar);
 router.post('/', agregar);
-router.put('/', actualizar);  
+router.put('/', actualizar);
 router.delete('/', eliminar);
 
 async function todos(req, res) {
@@ -18,22 +18,22 @@ async function todos(req, res) {
   }
 }
 
-async function uno(req, res) {
-    try {
-      const { id } = req.body; // Obtener el ID desde el cuerpo de la solicitud
-      if (!id) {
-        return respuestas.error(req, res, 'ID del usuario es requerido', 400);
-      }
-      const items = await controlador.uno(id);
-      if (!items) {
-        respuestas.error(req, res, 'Usuario no encontrado', 404);
-      } else {
-        respuestas.success(req, res, items, 200);
-      }
-    } catch (err) {
-      respuestas.error(req, res, err.message, 500, err);
+async function buscar(req, res) {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return respuestas.error(req, res, 'ID del usuario es requerido', 400);
     }
+    const items = await controlador.uno(id);
+    if (!items) {
+      respuestas.error(req, res, 'Usuario no encontrado', 404);
+    } else {
+      respuestas.success(req, res, items, 200);
+    }
+  } catch (err) {
+    respuestas.error(req, res, err.message, 500, err);
   }
+}
 
 async function agregar(req, res, next) {
   try {
@@ -46,25 +46,25 @@ async function agregar(req, res, next) {
 }
 
 async function actualizar(req, res, next) {
-    try {
-      const { id, ...data } = req.body; // Obtener el ID y los datos desde el cuerpo de la solicitud
-      if (!id) {
-        return respuestas.error(req, res, 'ID del usuario es requerido', 400);
-      }
-      const actualizados = await controlador.actualizar(id, data);
-      if (actualizados === 0) {
-        respuestas.error(req, res, 'El usuario no existe o no se pudo actualizar', 404);
-      } else {
-        respuestas.success(req, res, `Usuario con ID ${id} actualizado exitosamente`, 200);
-      }
-    } catch (err) {
-      next(err);
+  try {
+    const { id, ...data } = req.body;
+    if (!id) {
+      return respuestas.error(req, res, 'ID del usuario es requerido', 400);
     }
+    const actualizados = await controlador.actualizar(id, data);
+    if (actualizados === 0) {
+      respuestas.error(req, res, 'El usuario no existe o no se pudo actualizar', 404);
+    } else {
+      respuestas.success(req, res, `Usuario con ID ${id} actualizado exitosamente`, 200);
+    }
+  } catch (err) {
+    next(err);
   }
+}
 
 async function eliminar(req, res, next) {
   try {
-    const { id } = req.body; // Leer ID desde el cuerpo de la solicitud
+    const { id } = req.body;
     if (!id) {
       return respuestas.error(req, res, 'ID del usuario es requerido', 400);
     }
