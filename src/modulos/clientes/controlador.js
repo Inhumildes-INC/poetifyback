@@ -1,6 +1,6 @@
 const db = require("../../db/mysql");
 
-const TABLA = "usuarios";
+const TABLA = "clientes";
 
 
 
@@ -16,7 +16,7 @@ module.exports = function (dbInyectada){
         try {
           return await db.todos(TABLA);
         } catch (error) {
-          throw new Error(`Error al obtener todos los usuarios: ${error.message}`);
+          throw new Error(`Error al obtener todos los clientes: ${error.message}`);
         }
       }
       
@@ -24,7 +24,7 @@ module.exports = function (dbInyectada){
           try {
             return await db.uno(TABLA, id);
           } catch (error) {
-            throw new Error(`Error al obtener el usuario con id ${id}: ${error.message}`);
+            throw new Error(`Error al obtener el cliente con id ${id}: ${error.message}`);
           }
         }
       
@@ -33,7 +33,7 @@ module.exports = function (dbInyectada){
           const nuevoId = await db.agregar(TABLA, data);
           return nuevoId;
         } catch (error) {
-          throw new Error(`Error al agregar el nuevo usuario: ${error.message}`);
+          throw new Error(`Error al agregar el nuevo cliente: ${error.message}`);
         }
       }
       
@@ -41,13 +41,13 @@ module.exports = function (dbInyectada){
           try {
             const datoExistente = await db.uno(TABLA, id);
             if (!datoExistente) {
-              throw new Error(`El dato con ID ${id} no existe`);
+              throw new Error(`El cliente con ID ${id} no existe`);
             }
         
             const filasAfectadas = await db.actualizar(TABLA, id, data);
             return filasAfectadas;
           } catch (error) {
-            throw new Error(`Error al actualizar el dato con ID ${id}: ${error.message}`);
+            throw new Error(`Error al actualizar el cliente con ID ${id}: ${error.message}`);
           }
         }
       
@@ -55,13 +55,13 @@ module.exports = function (dbInyectada){
         try {
           const usuarioExistente = await db.uno(TABLA, id);
           if (!usuarioExistente) {
-            throw new Error(`El elemento con ID ${id} no existe`);
+            throw new Error(`El cliente con ID ${id} no existe`);
           }
       
           const filasAfectadas = await db.eliminar(TABLA, id);
           return filasAfectadas;
         } catch (error) {
-          throw new Error(`Error al eliminar el usuario con ID ${id}: ${error.message}`);
+          throw new Error(`Error al eliminar el cliente con ID ${id}: ${error.message}`);
         }
       }
       return {

@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const config = require('./config');
 
-const usuarios = require('./modulos/usuarios/rutas');
+const clientes = require('./modulos/clientes/rutas');
 const error = require('./red/errors');
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set('port', config.app.port);
 
-app.use('/usuarios', usuarios);
+app.use('/clientes', clientes);
 app.use(error);
 
 module.exports = app;
