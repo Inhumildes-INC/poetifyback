@@ -4,10 +4,10 @@ const controlador = require('./index'); // Importa el controlador correctamente
 const router = express.Router();
 
 router.get('/', todos);
-router.post('/', buscar);
-router.post('/', agregar);
-router.put('/', actualizar);
-router.delete('/', eliminar);
+router.post('/buscar', buscar); // Cambia la ruta a /buscar
+router.post('/agregar', agregar); // Cambia la ruta a /agregar
+router.put('/actualizar', actualizar); // Cambia la ruta a /actualizar
+router.delete('/eliminar', eliminar); // Cambia la ruta a /eliminar
 
 async function todos(req, res) {
   try {
