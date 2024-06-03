@@ -11,12 +11,12 @@ async function todos() {
 }
 
 async function uno(id) {
-  try {
-    return await db.uno(TABLA, id);
-  } catch (error) {
-    throw new Error(`Error al obtener el usuario con id ${id}: ${error.message}`);
+    try {
+      return await db.uno(TABLA, id);
+    } catch (error) {
+      throw new Error(`Error al obtener el usuario con id ${id}: ${error.message}`);
+    }
   }
-}
 
 async function agregar(data) {
   try {
@@ -45,7 +45,7 @@ async function eliminar(id) {
   try {
     const usuarioExistente = await db.uno(TABLA, id);
     if (!usuarioExistente) {
-      throw new Error(`El usuario con ID ${id} no existe`);
+      throw new Error(`El elemento con ID ${id} no existe`);
     }
 
     const filasAfectadas = await db.eliminar(TABLA, id);

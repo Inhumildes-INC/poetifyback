@@ -4,7 +4,7 @@ const controlador = require('./controlador');
 const router = express.Router();
 
 router.get('/', todos);
-router.get('/:id', uno);
+router.post('/buscar', uno);
 router.post('/', agregar);
 router.put('/', actualizar);  
 router.delete('/', eliminar);
@@ -19,17 +19,21 @@ async function todos(req, res) {
 }
 
 async function uno(req, res) {
-  try {
-    const items = await controlador.uno(req.params.id);
-    if (!items) {
-      respuestas.error(req, res, 'Usuario no encontrado', 404);
-    } else {
-      respuestas.success(req, res, items, 200);
+    try {
+      const { id } = req.body; // Obtener el ID desde el cuerpo de la solicitud
+      if (!id) {
+        return respuestas.error(req, res, 'ID del usuario es requerido', 400);
+      }
+      const items = await controlador.uno(id);
+      if (!items) {
+        respuestas.error(req, res, 'Usuario no encontrado', 404);
+      } else {
+        respuestas.success(req, res, items, 200);
+      }
+    } catch (err) {
+      respuestas.error(req, res, err.message, 500, err);
     }
-  } catch (err) {
-    respuestas.error(req, res, err.message, 500, err);
   }
-}
 
 async function agregar(req, res, next) {
   try {
