@@ -31,49 +31,36 @@ async function connectDB() {
 
 connectDB();
 
-async function todos(tabla) {
+async function query(sql, params) {
   try {
-    const [rows] = await connection.query(`SELECT * FROM ${tabla}`);
+    const [rows] = await connection.query(sql, params);
     return rows;
   } catch (error) {
-    throw new Error(`Error al obtener todos los registros de la tabla ${tabla}: ${error.message}`);
+    throw new Error(`Error en la consulta: ${error.message}`);
   }
+}
+
+async function todos(tabla) {
+  return query(`SELECT * FROM ${tabla}`);
 }
 
 async function uno(tabla, id) {
-  try {
-    const [rows] = await connection.query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
-    return rows[0];
-  } catch (error) {
-    throw new Error(`Error al obtener el registro con id ${id} de la tabla ${tabla}: ${error.message}`);
-  }
+  return query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
 }
 
 async function agregar(tabla, data) {
-  try {
-    const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
-    return result.insertId;
-  } catch (error) {
-    throw new Error(`Error al agregar un nuevo registro a la tabla ${tabla}: ${error.message}`);
-  }
+  const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
+  return result.insertId;
 }
 
 async function actualizar(tabla, id, data) {
-    try {
-      const [result] = await connection.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
-      return result.affectedRows;
-    } catch (error) {
-      throw new Error(`Error al actualizar el registro con ID ${id} de la tabla ${tabla}: ${error.message}`);
-    }
-  }  
+  const [result] = await connection.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
+  return result.affectedRows;
+}
 
 async function eliminar(tabla, id) {
-  try {
-    const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
-    return result.affectedRows;
-  } catch (error) {
-    throw new Error(`Error al eliminar el registro con ID ${id} de la tabla ${tabla}: ${error.message}`);
-  }
+  const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
+  return result.affectedRows;
 }
 
 module.exports = {
