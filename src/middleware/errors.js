@@ -1,10 +1,13 @@
-function error (message, code){
-    let e = new Error(message);
+const respuestas = require('../red/respuestas');
+const { CustomError } = require('../errors/erroresPersonalizados');
 
-    if (code) {
-        e.statusCode = code;
-    }
-    return e;
+function errors(err, req, res, next) {
+  console.error('[error]', err);
+
+  const message = err.message || 'Error interno';
+  const status = err.statusCode || 500;
+
+  respuestas.error(req, res, message, status, err.stack);
 }
 
-module.exports = error;
+module.exports = errors;
