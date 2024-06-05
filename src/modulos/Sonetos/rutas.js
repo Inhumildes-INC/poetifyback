@@ -2,10 +2,20 @@ const express = require('express');
 const respuestas = require('../../red/respuestas');
 const controlador = require('./index');
 const SonetoController = require('./SonetoController');
+const { poemaCategoria } = require('./poemaCategoriaController');
 const router = express.Router();
 
 router.get('/', todos);
 router.post('/buscar', SonetoController.buscar);
+router.post('/categoria', async (req, res) => {
+  try {
+    const { idCategoria } = req.body;
+    const poema = await poemaCategoria(idCategoria);
+    respuestas.success(req, res, poema, 200);
+  } catch (err) {
+    respuestas.error(req, res, err.message, 500, err);
+  }
+});
 
 
 async function todos(req, res) {
