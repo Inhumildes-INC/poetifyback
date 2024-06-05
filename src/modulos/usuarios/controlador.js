@@ -11,7 +11,7 @@ async function todos() {
 async function uno(id) {
   const cliente = await db.uno(TABLA_USUARIO, id);
   if (!cliente) {
-    throw new NotFoundError(`El cliente con ID ${id} no existe`);
+    throw new NotFoundError(`El usuario con ID ${id} no existe`);
   }
   return cliente;
 }
@@ -24,7 +24,7 @@ async function agregar(data) {
   try {
     return await db.agregar(TABLA_USUARIO, data);
   } catch (error) {
-    throw new InternalServerError("Error al agregar el cliente");
+    throw new InternalServerError("Error al agregar el usuario");
   }
 }
 
