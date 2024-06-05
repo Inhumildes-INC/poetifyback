@@ -1,6 +1,9 @@
+// src/modulos/clientes/rutas.js
 const express = require('express');
 const respuestas = require('../../red/respuestas');
 const controlador = require('./index'); 
+const { NotFoundError, BadRequestError } = require("../../errors/erroresPersonalizados");
+
 const router = express.Router();
 
 router.get('/', todos);
@@ -8,6 +11,7 @@ router.post('/buscar', buscar);
 router.post('/agregar', agregar);
 router.put('/actualizar', actualizar); 
 router.delete('/eliminar', eliminar);
+router.post('/biblioteca', enlazarBiblioteca);
 
 async function todos(req, res) {
   try {
@@ -30,7 +34,6 @@ async function buscar(req, res) {
     respuestas.error(req, res, err.message, err.statusCode || 500, err);
   }
 }
-
 
 async function agregar(req, res, next) {
   try {
@@ -63,6 +66,21 @@ async function eliminar(req, res, next) {
     }
     const eliminados = await controlador.eliminar(id);
     respuestas.success(req, res, `Cliente con ID ${id} eliminado exitosamente`, 200);
+  } catch (err) {
+    respuestas.error(req, res, err.message, err.statusCode || 500, err);
+  }
+}
+
+async function enlazarBiblioteca(req, res, next) {
+  try {
+    const { usuarioId, bibliotecaId } = req.body;
+    if (!usuarioId || !bibliotecaId) {
+      throw new BadRequestError('ID del usuario y ID de la biblioteca son requeridos');
+    }
+
+    await controlador.enlazarBiblioteca(usuarioId, bibliotecaId);
+    
+    respuestas.success(req, res, `Biblioteca enlazada correctamente con el usuario`, 200);
   } catch (err) {
     respuestas.error(req, res, err.message, err.statusCode || 500, err);
   }
