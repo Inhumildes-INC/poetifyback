@@ -1,5 +1,5 @@
 const { NotFoundError, BadRequestError, InternalServerError } = require('../../errors/erroresPersonalizados');
-const TABLA = "clientes";
+const TABLA = "usuario";
 
 module.exports = function (dbInyectada) {
   let db = dbInyectada || require('../../db/mysql');

@@ -1,3 +1,4 @@
+// src/db/mysql.js
 const mysql = require('mysql2/promise');
 const config = require('../config');
 
@@ -32,6 +33,9 @@ async function connectDB() {
 connectDB();
 
 async function query(sql, params) {
+  if (!connection) {
+    await connectDB();
+  }
   try {
     const [rows] = await connection.query(sql, params);
     return rows;
@@ -64,6 +68,7 @@ async function eliminar(tabla, id) {
 }
 
 module.exports = {
+  query,
   todos,
   uno,
   agregar,
