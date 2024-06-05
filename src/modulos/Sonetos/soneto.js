@@ -1,4 +1,3 @@
-// src/modulos/Sonetos/soneto.js
 const db = require('../../db/mysql');
 
 class Soneto {

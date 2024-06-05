@@ -2,10 +2,10 @@ const Soneto = require('./soneto');
 
 async function poemaCategoria(idCategoria) {
   let poema = "";
-  const categoriaInicial = idCategoria;
   const maxIntentosCategoria = 15; // Intentos máximos para encontrar un verso en la categoría actual
   const maxIntentosTotal = 25; // Intentos máximos totales, incluyendo cambios de categoría
   let poemaArray = new Array(14).fill("");
+  let sonetosUsados = new Array(14).fill(null);
 
   // Generar un array de índices aleatorios
   const indicesAleatorios = Array.from({ length: 14 }, (_, index) => index + 1);
@@ -16,7 +16,7 @@ async function poemaCategoria(idCategoria) {
 
   for (let i = 0; i < 14; i++) {
     let intentosCategoria = 0;
-    let categoriaActual = categoriaInicial;
+    let categoriaActual = idCategoria !== undefined && idCategoria !== null ? idCategoria : Math.floor(Math.random() * 14) + 1;
 
     while (intentosCategoria < maxIntentosCategoria) {
       const aleatorio = Math.floor(Math.random() * 10); // Generar un número aleatorio entre 0 y 9
@@ -25,6 +25,7 @@ async function poemaCategoria(idCategoria) {
 
       if (soneto.length > 0) {
         poemaArray[indicesAleatorios[i] - 1] = soneto[0].verso;
+        sonetosUsados[indicesAleatorios[i] - 1] = soneto[0].id; // Guardar el ID del soneto utilizado
         break; // Se encontró un verso, salir del bucle
       } else {
         intentosCategoria++;
@@ -41,6 +42,7 @@ async function poemaCategoria(idCategoria) {
 
         if (soneto.length > 0) {
           poemaArray[indicesAleatorios[i] - 1] = soneto[0].verso;
+          sonetosUsados[indicesAleatorios[i] - 1] = soneto[0].id; // Guardar el ID del soneto utilizado
           break; // Se encontró un verso, salir del bucle
         }
       }
@@ -49,7 +51,7 @@ async function poemaCategoria(idCategoria) {
 
   poema = poemaArray.join("\n");
   console.log(poema);
-  return poema;
+  return { poema, sonetosUsados };
 }
 
 module.exports = {

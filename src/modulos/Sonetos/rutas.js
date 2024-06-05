@@ -10,13 +10,23 @@ router.post('/buscar', SonetoController.buscar);
 router.post('/categoria', async (req, res) => {
   try {
     const { idCategoria } = req.body;
-    const poema = await poemaCategoria(idCategoria);
-    respuestas.success(req, res, poema, 200);
+    const { poema, sonetosUsados } = await poemaCategoria(idCategoria);
+    respuestas.success(req, res, { poema, sonetosUsados }, 200);
   } catch (err) {
     respuestas.error(req, res, err.message, 500, err);
   }
 });
 
+router.post('/guardar', async (req, res) => {
+  try {
+    const { idBiblioteca, poema, sonetosUsados } = req.body;
+    const idPoema = await controlador.guardarPoema(poema, sonetosUsados);
+    await controlador.guardarPoemaBiblioteca(idBiblioteca, idPoema, poema);
+    respuestas.success(req, res, { idPoema }, 200);
+  } catch (err) {
+    respuestas.error(req, res, err.message, 500, err);
+  }
+});
 
 async function todos(req, res) {
   try {
@@ -26,16 +36,5 @@ async function todos(req, res) {
     respuestas.error(req, res, err.message, 500, err);
   }
 }
-
-/*async function buscar(req, res) {
-  try {
-    const { posicion, poema, idcategoria } = req.body; // Obtener los valores de posicion, poema e idcategoria del cuerpo de la solicitud
-    const filtros = { posicion, poema, idcategoria }; // Construir el objeto de filtros
-    const sonetosFiltrados = await controlador.buscar(filtros); // Llamar a la función buscar del controlador
-    respuestas.success(req, res, sonetosFiltrados, 200);
-  } catch (err) {
-    respuestas.error(req, res, err.message, err.statusCode || 500, err);
-  }
-}*/
 
 module.exports = router;
