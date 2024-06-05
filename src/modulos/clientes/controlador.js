@@ -28,13 +28,19 @@ async function agregar(data) {
   }
 }
 
-async function enlazarBiblioteca(usuarioId, bibliotecaId) {
+async function crearBibliotecaYEnlazar(usuarioId) {
   const usuario = await db.uno(TABLA_USUARIO, usuarioId);
   if (!usuario) {
     throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
   }
 
-  await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: bibliotecaId });
+  const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
+
+  // Crear nueva biblioteca
+  const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
+
+  // Enlazar la nueva biblioteca con el usuario
+  await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
 }
 
 async function actualizar(id, data) {
@@ -57,7 +63,7 @@ module.exports = {
   todos,
   uno,
   agregar,
-  enlazarBiblioteca,
+  crearBibliotecaYEnlazar,
   actualizar,
   eliminar,
 };

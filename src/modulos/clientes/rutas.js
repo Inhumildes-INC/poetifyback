@@ -9,7 +9,7 @@ router.post('/buscar', buscar);
 router.post('/agregar', agregar);
 router.put('/actualizar', actualizar);
 router.delete('/eliminar', eliminar);
-router.post('/biblioteca', enlazarBiblioteca);
+router.post('/crearbiblioteca', crearBibliotecaYEnlazar);
 
 async function todos(req, res) {
   try {
@@ -69,16 +69,16 @@ async function eliminar(req, res) {
   }
 }
 
-async function enlazarBiblioteca(req, res) {
+async function crearBibliotecaYEnlazar(req, res) {
   try {
-    const { usuarioId, bibliotecaId } = req.body;
-    if (!usuarioId || !bibliotecaId) {
-      throw new BadRequestError('ID del usuario y ID de la biblioteca son requeridos');
+    const { usuarioId } = req.body;
+    if (!usuarioId) {
+      throw new BadRequestError('ID del usuario es requerido');
     }
 
-    await controlador.enlazarBiblioteca(usuarioId, bibliotecaId);
+    await controlador.crearBibliotecaYEnlazar(usuarioId);
 
-    respuestas.success(req, res, `Biblioteca enlazada correctamente con el usuario`);
+    respuestas.success(req, res, `Biblioteca creada y enlazada correctamente con el usuario`);
   } catch (err) {
     respuestas.error(req, res, err.message, err.statusCode || 500);
   }
