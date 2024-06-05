@@ -48,10 +48,11 @@ async function todos(tabla) {
   return query(`SELECT * FROM ${tabla}`);
 }
 
-async function uno(tabla, id) {
-  const rows = await query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
+async function uno(tabla, condicion) {
+  const rows = await query(`SELECT * FROM ${tabla} WHERE ?`, [condicion]);
   return rows[0];
 }
+
 
 async function agregar(tabla, data) {
   const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
@@ -90,15 +91,15 @@ async function rollback() {
   await connection.rollback();
 }
 
-async function agregarBiblioteca() {
+async function agregarBiblioteca(bibliotecaData) {
   try {
-    const bibliotecaData = {}; // Puedes agregar aquí cualquier dato adicional necesario para la biblioteca
     const idBiblioteca = await db.agregar(TABLA_BIBLIOTECA, bibliotecaData);
     return idBiblioteca;
   } catch (error) {
     throw new InternalServerError("Error al agregar la biblioteca");
   }
 }
+
 
 
 module.exports = {

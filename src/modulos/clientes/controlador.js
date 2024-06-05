@@ -29,19 +29,34 @@ async function agregar(data) {
 }
 
 async function crearBibliotecaYEnlazar(usuarioId) {
-  const usuario = await db.uno(TABLA_USUARIO, usuarioId);
-  if (!usuario) {
-    throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
+  try {
+    const usuario = await db.uno(TABLA_USUARIO, { id: usuarioId }); // Corregir la forma en que se pasa el parámetro de búsqueda
+    if (!usuario) {
+      throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
+    }
+
+    // Verificar si el usuario ya tiene una biblioteca
+    if (usuario.id_biblioteca) {
+      throw new BadRequestError(`El usuario con ID ${usuarioId} ya tiene una biblioteca asociada`);
+    }
+
+    const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
+
+    // Crear nueva biblioteca
+    const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
+
+    // Enlazar la nueva biblioteca con el usuario
+    await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
+
+    return `Biblioteca creada y enlazada correctamente con el usuario`;
+  } catch (err) {
+    throw err;
   }
-
-  const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
-
-  // Crear nueva biblioteca
-  const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
-
-  // Enlazar la nueva biblioteca con el usuario
-  await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
 }
+
+
+
+
 
 async function actualizar(id, data) {
   const clienteExistente = await db.uno(TABLA_USUARIO, id);
