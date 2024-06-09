@@ -1,4 +1,3 @@
-// src/rutas/biblioteca.js
 const express = require('express');
 const respuestas = require('../../red/respuestas');
 const controlador = require('./index'); 
@@ -10,6 +9,7 @@ router.post('/agregar', agregar);
 router.put('/actualizar', actualizar); 
 router.delete('/eliminar', eliminar);
 router.post('/crearbiblioteca', crearBibliotecaYEnlazar);
+router.get('/:idBiblioteca/poemas', buscarPoemasPorBiblioteca); // Ruta correcta
 
 async function todos(req, res) {
   try {
@@ -79,6 +79,16 @@ async function crearBibliotecaYEnlazar(req, res) {
     await controlador.crearBibliotecaYEnlazar(usuarioId);
 
     respuestas.success(req, res, `Biblioteca creada y enlazada correctamente con el usuario`);
+  } catch (err) {
+    respuestas.error(req, res, err.message, err.statusCode || 500);
+  }
+}
+
+async function buscarPoemasPorBiblioteca(req, res) {
+  try {
+    const { idBiblioteca } = req.params;
+    const poemas = await controlador.buscarPoemasPorBiblioteca(idBiblioteca);
+    respuestas.success(req, res, poemas, 200);
   } catch (err) {
     respuestas.error(req, res, err.message, err.statusCode || 500);
   }

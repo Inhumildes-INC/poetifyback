@@ -1,7 +1,9 @@
+// src/componentes/biblioteca/controlador.js
 const { NotFoundError, BadRequestError, InternalServerError } = require('../../errors/erroresPersonalizados');
 const TABLA = "poemas_x_biblioteca";
 const TABLA_USUARIO = "usuario";
 const TABLA_BIBLIOTECA = "biblioteca";
+const TABLA_POEMAS = "poemas"; // Añadir la tabla de poemas
 
 module.exports = function (dbInyectada) {
   let db = dbInyectada || require('../../db/mysql');
@@ -20,29 +22,24 @@ module.exports = function (dbInyectada) {
 
   async function agregar(data) {
     if (!data.nombre || !data.id_poema || !data.id_biblioteca) {
-      throw new BadRequestError('El nombre y los ID son requeridos son requeridos');
+      throw new BadRequestError('El nombre y los ID son requeridos');
     }
     return db.agregar(TABLA, data);
   }
 
   async function crearBibliotecaYEnlazar(usuarioId) {
     try {
-      const usuario = await db.uno(TABLA_USUARIO, { id: usuarioId }); // Corregir la forma en que se pasa el parámetro de búsqueda
+      const usuario = await db.uno(TABLA_USUARIO, { id: usuarioId });
       if (!usuario) {
         throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
       }
   
-      // Verificar si el usuario ya tiene una biblioteca
       if (usuario.id_biblioteca) {
         throw new BadRequestError(`El usuario con ID ${usuarioId} ya tiene una biblioteca asociada`);
       }
   
       const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
-  
-      // Crear nueva biblioteca
       const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
-  
-      // Enlazar la nueva biblioteca con el usuario
       await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
   
       return `Biblioteca creada y enlazada correctamente con el usuario`;
@@ -67,6 +64,19 @@ module.exports = function (dbInyectada) {
     return db.eliminar(TABLA, id);
   }
 
+  async function buscarPoemasPorBiblioteca(idBiblioteca) {
+    const poemas = await db.query(`
+      SELECT p.contenido 
+      FROM ${TABLA} pb
+      JOIN ${TABLA_POEMAS} p ON pb.id_poema = p.id
+      WHERE pb.id_biblioteca = ?
+    `, [idBiblioteca]);
+    if (poemas.length === 0) {
+      throw new NotFoundError(`No se encontraron poemas para la biblioteca con ID ${idBiblioteca}`);
+    }
+    return poemas;
+  }
+
   return {
     todos,
     uno,
@@ -74,5 +84,6 @@ module.exports = function (dbInyectada) {
     crearBibliotecaYEnlazar,
     actualizar,
     eliminar,
+    buscarPoemasPorBiblioteca,
   };
 };
