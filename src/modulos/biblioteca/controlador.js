@@ -3,7 +3,7 @@ const { NotFoundError, BadRequestError, InternalServerError } = require('../../e
 const TABLA = "poemas_x_biblioteca";
 const TABLA_USUARIO = "usuario";
 const TABLA_BIBLIOTECA = "biblioteca";
-const TABLA_POEMAS = "poemas"; // Añadir la tabla de poemas
+const TABLA_POEMAS = "poemas"; 
 
 module.exports = function (dbInyectada) {
   let db = dbInyectada || require('../../db/mysql');
