@@ -2,42 +2,36 @@
 const mysql = require('mysql2/promise');
 const config = require('../config');
 
+// Configuración del pool de conexiones
 const dbconfig = {
   host: config.mysql.host,
   user: config.mysql.user,
   password: config.mysql.password,
   database: config.mysql.database,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 };
 
-let connection;
+// Creación del pool de conexiones
+const pool = mysql.createPool(dbconfig);
 
-async function connectDB() {
+// Función para probar la conexión inicial
+async function testConnection() {
   try {
-    connection = await mysql.createConnection(dbconfig);
+    const connection = await pool.getConnection();
     console.log('DB conectada!!!');
-
-    connection.on('error', async (err) => {
-      console.log('[db err]', err);
-      if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-        await connectDB();
-      } else {
-        throw err;
-      }
-    });
-  } catch (err) {
-    console.log('[db err]', err);
-    setTimeout(connectDB, 2000);
+    connection.release();
+  } catch (error) {
+    console.error('Error al conectar con la DB:', error.message);
   }
 }
 
-connectDB();
+testConnection();
 
 async function query(sql, params) {
-  if (!connection) {
-    await connectDB();
-  }
   try {
-    const [rows] = await connection.query(sql, params);
+    const [rows] = await pool.query(sql, params);
     return rows;
   } catch (error) {
     throw new Error(`Error en la consulta: ${error.message}`);
@@ -53,54 +47,46 @@ async function uno(tabla, condicion) {
   return rows[0];
 }
 
-
 async function agregar(tabla, data) {
-  const [result] = await connection.query(`INSERT INTO ${tabla} SET ?`, data);
+  const [result] = await pool.query(`INSERT INTO ${tabla} SET ?`, data);
   return result.insertId;
 }
 
 async function actualizar(tabla, id, data) {
-  const [result] = await connection.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
+  const [result] = await pool.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
   return result.affectedRows;
 }
 
 async function eliminar(tabla, id) {
-  const [result] = await connection.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
+  const [result] = await pool.query(`DELETE FROM ${tabla} WHERE id = ?`, [id]);
   return result.affectedRows;
 }
 
 // Transaction handling
 async function beginTransaction() {
-  if (!connection) {
-    await connectDB();
-  }
+  const connection = await pool.getConnection();
   await connection.beginTransaction();
+  return connection;
 }
 
-async function commit() {
-  if (!connection) {
-    await connectDB();
-  }
+async function commit(connection) {
   await connection.commit();
+  connection.release();
 }
 
-async function rollback() {
-  if (!connection) {
-    await connectDB();
-  }
+async function rollback(connection) {
   await connection.rollback();
+  connection.release();
 }
 
 async function agregarBiblioteca(bibliotecaData) {
   try {
-    const idBiblioteca = await db.agregar(TABLA_BIBLIOTECA, bibliotecaData);
+    const idBiblioteca = await agregar(TABLA_BIBLIOTECA, bibliotecaData);
     return idBiblioteca;
   } catch (error) {
     throw new InternalServerError("Error al agregar la biblioteca");
   }
 }
-
-
 
 module.exports = {
   query,
@@ -114,4 +100,3 @@ module.exports = {
   rollback,
   agregarBiblioteca,
 };
-
