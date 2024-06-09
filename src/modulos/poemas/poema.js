@@ -10,7 +10,7 @@ class Poema {
   static async crear(cuerpo, contenido) {
     try {
       const idPoema = await db.agregar("poemas", { cuerpo, contenido });
-      return idPoema;
+      return idPoema; 
     } catch (error) {
       throw new Error("Error al crear el poema");
     }
