@@ -114,13 +114,13 @@ async function poemaCategoria(idCategoria) {
     poema = poemaArray.join("\n");
     console.log(poema);
 
-    const guardarPoema = await preguntarGuardarPoema();
-    let poemaId = null;
-    if (guardarPoema) {
-      poemaId = await guardarPoemaEnBD(sonetosUsados, poema);
-    } else {
-      console.log("El poema no se guardará en la base de datos.");
-    }
+    //const guardarPoema = await preguntarGuardarPoema();
+    //let poemaId = null;
+    //if (guardarPoema) {
+      //poemaId = await guardarPoemaEnBD(sonetosUsados, poema);
+    //} else {
+      //console.log("El poema no se guardará en la base de datos.");
+    //}
 
     return { poemaId, sonetosUsados, poema };
   } catch (error) {

@@ -1,75 +1,77 @@
-const { NotFoundError, BadRequestError, InternalServerError } = require("../../errors/erroresPersonalizados");
+// src/componentes/usuario/controlador.js
+const bcrypt = require('bcrypt');
+const { NotFoundError, BadRequestError, InternalServerError } = require('../../errors/erroresPersonalizados');
 const db = require('../../db/mysql');
 
 const TABLA_USUARIO = "usuario";
-const TABLA_BIBLIOTECA = "biblioteca";
+const TABLA_TELEFONO = "telefono";
 
 async function todos() {
   return db.todos(TABLA_USUARIO);
 }
 
 async function uno(id) {
-  const cliente = await db.uno(TABLA_USUARIO, id);
-  if (!cliente) {
+  const usuario = await db.uno(TABLA_USUARIO, id);
+  if (!usuario) {
     throw new NotFoundError(`El usuario con ID ${id} no existe`);
   }
-  return cliente;
+  return usuario;
 }
 
 async function agregar(data) {
-  if (!data.nombre) {
-    throw new BadRequestError("Nombre es requerido");
+  if (!data.nombre || !data.email || !data.password) {
+    throw new BadRequestError("Nombre, email y contraseña son requeridos");
   }
 
+  // Verificar existencia de nombre o email
+  const usuarioExistente = await db.query(`SELECT * FROM ${TABLA_USUARIO} WHERE nombre = ? OR email = ?`, [data.nombre, data.email]);
+  if (usuarioExistente.length > 0) {
+    throw new BadRequestError("El nombre o el email ya existen");
+  }
+
+  // Encriptar contraseña
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  data.password = hashedPassword;
+
+  let telefonoId = null;
+  const connection = await db.beginTransaction();
   try {
-    return await db.agregar(TABLA_USUARIO, data);
+    // Insertar teléfono si se proporcionan
+    if (data.telefono1 || data.telefono2) {
+      const nuevoTelefono = { telefono1: data.telefono1, telefono2: data.telefono2 };
+      telefonoId = await db.agregar(TABLA_TELEFONO, nuevoTelefono);
+    }
+
+    data.id_telefono = telefonoId;
+
+    // Remover campos no pertenecientes a la tabla usuario
+    delete data.telefono1;
+    delete data.telefono2;
+
+    // Insertar usuario
+    const usuarioId = await db.agregar(TABLA_USUARIO, data);
+
+    await db.commit(connection);
+
+    return usuarioId;
   } catch (error) {
-    throw new InternalServerError("Error al agregar el usuario");
+    await db.rollback(connection);
+    throw new InternalServerError(`Error al agregar el usuario: ${error.message}`);
   }
 }
-
-async function crearBibliotecaYEnlazar(usuarioId) {
-  try {
-    const usuario = await db.uno(TABLA_USUARIO, { id: usuarioId }); // Corregir la forma en que se pasa el parámetro de búsqueda
-    if (!usuario) {
-      throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
-    }
-
-    // Verificar si el usuario ya tiene una biblioteca
-    if (usuario.id_biblioteca) {
-      throw new BadRequestError(`El usuario con ID ${usuarioId} ya tiene una biblioteca asociada`);
-    }
-
-    const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
-
-    // Crear nueva biblioteca
-    const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
-
-    // Enlazar la nueva biblioteca con el usuario
-    await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
-
-    return `Biblioteca creada y enlazada correctamente con el usuario`;
-  } catch (err) {
-    throw err;
-  }
-}
-
-
-
-
 
 async function actualizar(id, data) {
-  const clienteExistente = await db.uno(TABLA_USUARIO, id);
-  if (!clienteExistente) {
-    throw new NotFoundError(`El cliente con ID ${id} no existe`);
+  const usuarioExistente = await db.uno(TABLA_USUARIO, id);
+  if (!usuarioExistente) {
+    throw new NotFoundError(`El usuario con ID ${id} no existe`);
   }
   return db.actualizar(TABLA_USUARIO, id, data);
 }
 
 async function eliminar(id) {
-  const clienteExistente = await db.uno(TABLA_USUARIO, id);
-  if (!clienteExistente) {
-    throw new NotFoundError(`El cliente con ID ${id} no existe`);
+  const usuarioExistente = await db.uno(TABLA_USUARIO, id);
+  if (!usuarioExistente) {
+    throw new NotFoundError(`El usuario con ID ${id} no existe`);
   }
   return db.eliminar(TABLA_USUARIO, id);
 }
@@ -78,7 +80,6 @@ module.exports = {
   todos,
   uno,
   agregar,
-  crearBibliotecaYEnlazar,
   actualizar,
   eliminar,
 };

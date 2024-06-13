@@ -42,8 +42,8 @@ async function todos(tabla) {
   return query(`SELECT * FROM ${tabla}`);
 }
 
-async function uno(tabla, condicion) {
-  const rows = await query(`SELECT * FROM ${tabla} WHERE ?`, [condicion]);
+async function uno(tabla, id) {
+  const rows = await query(`SELECT * FROM ${tabla} WHERE id = ?`, [id]);
   return rows[0];
 }
 
@@ -62,7 +62,7 @@ async function eliminar(tabla, id) {
   return result.affectedRows;
 }
 
-// Transaction handling
+// Manejo de transacciones
 async function beginTransaction() {
   const connection = await pool.getConnection();
   await connection.beginTransaction();
@@ -79,15 +79,6 @@ async function rollback(connection) {
   connection.release();
 }
 
-async function agregarBiblioteca(bibliotecaData) {
-  try {
-    const idBiblioteca = await agregar(TABLA_BIBLIOTECA, bibliotecaData);
-    return idBiblioteca;
-  } catch (error) {
-    throw new InternalServerError("Error al agregar la biblioteca");
-  }
-}
-
 module.exports = {
   query,
   todos,
@@ -98,5 +89,4 @@ module.exports = {
   beginTransaction,
   commit,
   rollback,
-  agregarBiblioteca,
 };
