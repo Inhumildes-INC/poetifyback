@@ -40,6 +40,19 @@ router.get("/categoria", async (req, res) => {
   }
 });
 
+router.post("/guardar", async (req, res) => {
+  try {
+    const { sonetosUsados, poema } = req.body;
+    if (!sonetosUsados || !poema) {
+      throw new BadRequestError("Los sonetos usados y el poema son requeridos");
+    }
+    const poemaId = await PoemaController.guardarPoemaEnBD(sonetosUsados, poema);
+    respuestas.success(req, res, { poemaId }, 201);
+  } catch (err) {
+    respuestas.error(req, res, err.message, err.statusCode || 500, err);
+  }
+});
+
 router.put("/actualizar", async (req, res) => {
   try {
     const { id, nuevoNombre } = req.body;

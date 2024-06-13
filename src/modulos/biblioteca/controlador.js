@@ -32,7 +32,7 @@ module.exports = function (dbInyectada) {
 
   async function crearBibliotecaYEnlazar(usuarioId) {
     try {
-      const usuario = await db.uno(TABLA_USUARIO, usuarioId); // Cambiado para pasar solo el ID
+      const usuario = await db.uno(TABLA_USUARIO, usuarioId); 
       if (!usuario) {
         throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
       }
