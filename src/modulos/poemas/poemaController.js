@@ -1,25 +1,15 @@
 //poemaController.js
 const Soneto = require("./soneto");
-const prompts = require("prompts");
 const db = require("../../db/mysql");
 
-async function preguntarGuardarPoema() {
-  const response = await prompts({
-    type: "confirm",
-    name: "confirmacion",
-    message: "¿Deseas guardar el poema generado?",
-    initial: true,
-  });
 
-  return response.confirmacion;
-}
 
-async function guardarPoemaEnBD(cuerpo, contenido) {
+async function guardarPoemaEnBD(sonetosUsados, poema) {
   try {
     // Crear un objeto con las claves y valores correspondientes
     const datos = {
-      cuerpo: JSON.stringify(cuerpo), // Convertir el JSON a una cadena antes de insertar
-      contenido: contenido,
+      sonetosUsados: JSON.stringify(sonetosUsados), // Convertir el JSON a una cadena antes de insertar
+      poema: poema,
     };
 
     // Insertar los datos en la base de datos
@@ -36,6 +26,7 @@ async function guardarPoemaEnBD(cuerpo, contenido) {
     throw error;
   }
 }
+
 
 async function poemaCategoria(idCategoria) {
   try {
@@ -114,17 +105,10 @@ async function poemaCategoria(idCategoria) {
     poema = poemaArray.join("\n");
     console.log(poema);
 
-    const guardarPoema = await preguntarGuardarPoema();
-    let poemaId = null;
-    if (guardarPoema) {
-      poemaId = await guardarPoemaEnBD(sonetosUsados, poema);
-    } else {
-      console.log("El poema no se guardará en la base de datos.");
-    }
-
-    return { poemaId, sonetosUsados, poema };
+    // Devolver el poema generado como respuesta
+    return { poemaId: null, poema, sonetosUsados }; // poemaId será null porque aún no se ha decidido guardar el poema
   } catch (error) {
-    throw new Error("Error al generar el poema y guardar en la base de datos");
+    throw new Error("Error al generar el poema");
   }
 }
 
