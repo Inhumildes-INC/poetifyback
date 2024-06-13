@@ -84,12 +84,12 @@ async function poemaCategoria(idCategoria) {
   }
 }
 
-async function guardarPoemaEnBD(sonetosUsados, poema) {
+async function guardarPoemaEnBD(cuerpo, contenido) {
   try {
     // Crear un objeto con las claves y valores correspondientes
     const datos = {
-      cuerpo: JSON.stringify(sonetosUsados), // Convertir el JSON a una cadena antes de insertar
-      contenido: poema,
+      cuerpo: JSON.stringify(cuerpo), // Convertir el JSON a una cadena antes de insertar
+      contenido: contenido,
     };
 
     // Insertar los datos en la base de datos
@@ -99,13 +99,11 @@ async function guardarPoemaEnBD(sonetosUsados, poema) {
     );
     return poemaId;
   } catch (error) {
-    console.error(
-      "Error al guardar el poema en la base de datos:",
-      error.message
-    );
+    console.error('Error al guardar el poema en la base de datos:', error.message);
     throw error;
   }
 }
+
 
 module.exports = {
   poemaCategoria,
