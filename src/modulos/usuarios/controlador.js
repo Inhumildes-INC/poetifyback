@@ -18,6 +18,14 @@ async function uno(id) {
   return usuario;
 }
 
+async function buscarPorNombreOEmail(identificador) {
+  const usuario = await db.query(`SELECT * FROM ${TABLA_USUARIO} WHERE nombre = ? OR email = ?`, [identificador, identificador]);
+  if (usuario.length === 0) {
+    throw new NotFoundError(`El usuario con nombre o email ${identificador} no existe`);
+  }
+  return usuario[0];
+}
+
 async function agregar(data) {
   if (!data.nombre || !data.email || !data.password) {
     throw new BadRequestError("Nombre, email y contraseña son requeridos");
@@ -79,6 +87,7 @@ async function eliminar(id) {
 module.exports = {
   todos,
   uno,
+  buscarPorNombreOEmail,
   agregar,
   actualizar,
   eliminar,

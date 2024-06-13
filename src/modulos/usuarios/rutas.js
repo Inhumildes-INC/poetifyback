@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get("/", todos);
 router.post("/buscar", buscar);
+router.post("/buscarNombre", buscarPorNombreOEmail);
 router.post("/agregar", agregar);
 router.put("/actualizar", actualizar);
 router.delete("/eliminar", eliminar);
@@ -27,6 +28,19 @@ async function buscar(req, res) {
       throw new BadRequestError("ID del usuario es requerido");
     }
     const usuario = await controlador.uno(id);
+    respuestas.success(req, res, usuario);
+  } catch (err) {
+    respuestas.error(req, res, err.message, err.statusCode || 500);
+  }
+}
+
+async function buscarPorNombreOEmail(req, res) {
+  try {
+    const { identificador } = req.body;
+    if (!identificador) {
+      throw new BadRequestError("Nombre o email del usuario es requerido");
+    }
+    const usuario = await controlador.buscarPorNombreOEmail(identificador);
     respuestas.success(req, res, usuario);
   } catch (err) {
     respuestas.error(req, res, err.message, err.statusCode || 500);
