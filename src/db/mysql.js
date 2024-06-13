@@ -47,6 +47,7 @@ async function uno(tabla, id) {
   return rows[0];
 }
 
+
 async function agregar(tabla, data) {
   const [result] = await pool.query(`INSERT INTO ${tabla} SET ?`, data);
   return result.insertId;

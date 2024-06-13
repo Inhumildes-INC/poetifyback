@@ -1,12 +1,15 @@
-// src/componentes/biblioteca/controlador.js
-const { NotFoundError, BadRequestError, InternalServerError } = require('../../errors/erroresPersonalizados');
+const {
+  NotFoundError,
+  BadRequestError,
+  InternalServerError,
+} = require("../../errors/erroresPersonalizados");
 const TABLA = "poemas_x_biblioteca";
 const TABLA_USUARIO = "usuario";
 const TABLA_BIBLIOTECA = "biblioteca";
-const TABLA_POEMAS = "poemas"; 
+const TABLA_POEMAS = "poemas";
 
 module.exports = function (dbInyectada) {
-  let db = dbInyectada || require('../../db/mysql');
+  let db = dbInyectada || require("../../db/mysql");
 
   async function todos() {
     return db.todos(TABLA);
@@ -22,26 +25,32 @@ module.exports = function (dbInyectada) {
 
   async function agregar(data) {
     if (!data.nombre || !data.id_poema || !data.id_biblioteca) {
-      throw new BadRequestError('El nombre y los ID son requeridos');
+      throw new BadRequestError("El nombre y los ID son requeridos");
     }
     return db.agregar(TABLA, data);
   }
 
   async function crearBibliotecaYEnlazar(usuarioId) {
     try {
-      const usuario = await db.uno(TABLA_USUARIO, { id: usuarioId });
+      const usuario = await db.uno(TABLA_USUARIO, usuarioId); // Cambiado para pasar solo el ID
       if (!usuario) {
         throw new NotFoundError(`El usuario con ID ${usuarioId} no existe`);
       }
-  
+
       if (usuario.id_biblioteca) {
-        throw new BadRequestError(`El usuario con ID ${usuarioId} ya tiene una biblioteca asociada`);
+        throw new BadRequestError(
+          `El usuario con ID ${usuarioId} ya tiene una biblioteca asociada`
+        );
       }
-  
+
       const nombreBiblioteca = `Biblioteca de: ${usuario.nombre}`;
-      const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, { nombre: nombreBiblioteca });
-      await db.actualizar(TABLA_USUARIO, usuarioId, { id_biblioteca: nuevaBibliotecaId });
-  
+      const nuevaBibliotecaId = await db.agregar(TABLA_BIBLIOTECA, {
+        nombre: nombreBiblioteca,
+      });
+      await db.actualizar(TABLA_USUARIO, usuarioId, {
+        id_biblioteca: nuevaBibliotecaId,
+      });
+
       return `Biblioteca creada y enlazada correctamente con el usuario`;
     } catch (err) {
       throw err;
@@ -65,14 +74,19 @@ module.exports = function (dbInyectada) {
   }
 
   async function buscarPoemasPorBiblioteca(idBiblioteca) {
-    const poemas = await db.query(`
+    const poemas = await db.query(
+      `
       SELECT p.contenido 
       FROM ${TABLA} pb
       JOIN ${TABLA_POEMAS} p ON pb.id_poema = p.id
       WHERE pb.id_biblioteca = ?
-    `, [idBiblioteca]);
+    `,
+      [idBiblioteca]
+    );
     if (poemas.length === 0) {
-      throw new NotFoundError(`No se encontraron poemas para la biblioteca con ID ${idBiblioteca}`);
+      throw new NotFoundError(
+        `No se encontraron poemas para la biblioteca con ID ${idBiblioteca}`
+      );
     }
     return poemas;
   }
