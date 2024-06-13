@@ -51,11 +51,15 @@ async function agregar(req, res) {
   try {
     const data = req.body;
     const nuevoUsuarioId = await controlador.agregar(data);
-    respuestas.success(req, res, `Usuario agregado con ID ${nuevoUsuarioId}`, 201);
+    
+    const mensaje = `Usuario agregado con ID ${nuevoUsuarioId}`;
+    respuestas.success(req, res, { nuevoUsuarioId, mensaje }, 201);
+    
   } catch (err) {
     respuestas.error(req, res, err.message, err.statusCode || 500);
   }
 }
+
 
 async function actualizar(req, res) {
   try {
