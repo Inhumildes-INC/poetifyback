@@ -1,32 +1,5 @@
-//poemaController.js
 const Soneto = require("./soneto");
 const db = require("../../db/mysql");
-
-
-
-async function guardarPoemaEnBD(sonetosUsados, poema) {
-  try {
-    // Crear un objeto con las claves y valores correspondientes
-    const datos = {
-      sonetosUsados: JSON.stringify(sonetosUsados), // Convertir el JSON a una cadena antes de insertar
-      poema: poema,
-    };
-
-    // Insertar los datos en la base de datos
-    const poemaId = await db.agregar("poemas", datos);
-    console.log(
-      `El poema se ha guardado en la base de datos con ID ${poemaId}`
-    );
-    return poemaId;
-  } catch (error) {
-    console.error(
-      "Error al guardar el poema en la base de datos:",
-      error.message
-    );
-    throw error;
-  }
-}
-
 
 async function poemaCategoria(idCategoria) {
   try {
@@ -105,48 +78,36 @@ async function poemaCategoria(idCategoria) {
     poema = poemaArray.join("\n");
     console.log(poema);
 
-    // Devolver el poema generado como respuesta
     return { poemaId: null, poema, sonetosUsados }; // poemaId será null porque aún no se ha decidido guardar el poema
   } catch (error) {
     throw new Error("Error al generar el poema");
   }
 }
 
-
-async function todos() {
+async function guardarPoemaEnBD(sonetosUsados, poema) {
   try {
-    const items = await controlador.todos();
-    return items;
-  } catch (err) {
-    throw new Error("Error al obtener todos los poemas");
-  }
-}
+    // Crear un objeto con las claves y valores correspondientes
+    const datos = {
+      cuerpo: JSON.stringify(sonetosUsados), // Convertir el JSON a una cadena antes de insertar
+      contenido: poema,
+    };
 
-async function editarNombrePoema(id, nuevoNombre) {
-  try {
-    const result = await db.actualizar("poemas_x_biblioteca", id, { nombre: nuevoNombre });
-    if (result.affectedRows === 0) {
-      throw new Error("No se encontró el poema con el ID especificado");
-    }
-    return result;
-  } catch (err) {
-    console.error("Error al actualizar el nombre del poema:", err.message);
-    throw err;
-  }
-}
-
-async function eliminarPoema(id) {
-  try {
-    const result = await db.eliminar("poemas", id);
-    return result;
-  } catch (err) {
-    throw new Error("Error al eliminar el poema");
+    // Insertar los datos en la base de datos
+    const poemaId = await db.agregar("poemas", datos);
+    console.log(
+      `El poema se ha guardado en la base de datos con ID ${poemaId}`
+    );
+    return poemaId;
+  } catch (error) {
+    console.error(
+      "Error al guardar el poema en la base de datos:",
+      error.message
+    );
+    throw error;
   }
 }
 
 module.exports = {
   poemaCategoria,
-  todos,
-  editarNombrePoema,
-  eliminarPoema,
+  guardarPoemaEnBD,
 };

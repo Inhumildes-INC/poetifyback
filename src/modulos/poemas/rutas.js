@@ -19,7 +19,7 @@ const categorias = {
 };
 
 Object.keys(categorias).forEach((dia) => {
-  router.post(`/categoria/${dia}`, async (req, res) => {
+  router.get(`/categoria/${dia}`, async (req, res) => {
     try {
       const idCategoria = categorias[dia];
       const { poemaId, poema, sonetosUsados } = await PoemaController.poemaCategoria(idCategoria);
@@ -30,7 +30,7 @@ Object.keys(categorias).forEach((dia) => {
   });
 });
 
-router.post("/categoria", async (req, res) => {
+router.get("/categoria", async (req, res) => {
   try {
     const { idCategoria } = req.body;
     const { poemaId, poema, sonetosUsados } = await PoemaController.poemaCategoria(idCategoria);
