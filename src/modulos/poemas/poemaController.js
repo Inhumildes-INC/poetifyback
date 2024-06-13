@@ -114,13 +114,13 @@ async function poemaCategoria(idCategoria) {
     poema = poemaArray.join("\n");
     console.log(poema);
 
-    //const guardarPoema = await preguntarGuardarPoema();
-    //let poemaId = null;
-    //if (guardarPoema) {
-      //poemaId = await guardarPoemaEnBD(sonetosUsados, poema);
-    //} else {
-      //console.log("El poema no se guardará en la base de datos.");
-    //}
+    const guardarPoema = await preguntarGuardarPoema();
+    let poemaId = null;
+    if (guardarPoema) {
+      poemaId = await guardarPoemaEnBD(sonetosUsados, poema);
+    } else {
+      console.log("El poema no se guardará en la base de datos.");
+    }
 
     return { poemaId, sonetosUsados, poema };
   } catch (error) {
@@ -138,7 +138,31 @@ async function todos() {
   }
 }
 
+async function editarNombrePoema(id, nuevoNombre) {
+  try {
+    const result = await db.actualizar("poemas_x_biblioteca", id, { nombre: nuevoNombre });
+    if (result.affectedRows === 0) {
+      throw new Error("No se encontró el poema con el ID especificado");
+    }
+    return result;
+  } catch (err) {
+    console.error("Error al actualizar el nombre del poema:", err.message);
+    throw err;
+  }
+}
+
+async function eliminarPoema(id) {
+  try {
+    const result = await db.eliminar("poemas", id);
+    return result;
+  } catch (err) {
+    throw new Error("Error al eliminar el poema");
+  }
+}
+
 module.exports = {
   poemaCategoria,
   todos,
+  editarNombrePoema,
+  eliminarPoema,
 };

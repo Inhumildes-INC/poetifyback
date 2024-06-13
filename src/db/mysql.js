@@ -52,9 +52,21 @@ async function agregar(tabla, data) {
   return result.insertId;
 }
 
-async function actualizar(tabla, id, data) {
-  const [result] = await pool.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, id]);
-  return result.affectedRows;
+async function actualizar(tabla, id, datos) {
+  try {
+    const keys = Object.keys(datos);
+    const values = Object.values(datos);
+    
+    const setClause = keys.map(key => `${key} = ?`).join(', ');
+    const sql = `UPDATE ${tabla} SET ${setClause} WHERE id = ?`;
+
+    const [result] = await pool.query(sql, [...values, id]);
+
+    return result;
+  } catch (error) {
+    console.error("Error en la actualización de la base de datos:", error.message);
+    throw error;
+  }
 }
 
 async function eliminar(tabla, id) {
