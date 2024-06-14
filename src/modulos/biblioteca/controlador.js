@@ -76,11 +76,11 @@ module.exports = function (dbInyectada) {
   async function buscarPoemasPorBiblioteca(idBiblioteca) {
     const poemas = await db.query(
       `
-      SELECT p.contenido 
+      SELECT pb.nombre, p.contenido 
       FROM ${TABLA} pb
       JOIN ${TABLA_POEMAS} p ON pb.id_poema = p.id
       WHERE pb.id_biblioteca = ?
-    `,
+      `,
       [idBiblioteca]
     );
     if (poemas.length === 0) {
@@ -90,6 +90,8 @@ module.exports = function (dbInyectada) {
     }
     return poemas;
   }
+  
+  
 
   return {
     todos,
