@@ -1,5 +1,7 @@
 Guía de instalación
+
 Ingresa a https://github.com/Inhumildes-INC/
+
 Descarga los repositorios llamados: FrontPoetify, poetifyback y Base-de-Datos-Poetify
 Descarga e instala xampp desde https://www.apachefriends.org/es/index.html
 Descarga e instala MySQL desde https://www.mysql.com/
