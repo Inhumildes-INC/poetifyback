@@ -73,8 +73,8 @@ Dependencias del Proyecto Frontend (FrontPoetify)
 Asegúrate de que en el package.json del proyecto FrontPoetify estén las siguientes dependencias (este es un ejemplo típico, ajusta según las necesidades reales del proyecto):
 
 json
-
-    "dependencies": {
+{
+  "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
@@ -83,7 +83,7 @@ json
     "nodemon": "^3.1.2",
     "prompts": "^2.4.2"
   },
-}
+} Esto se instala con npm i
 10. Registro en la Aplicación
 Abre tu navegador web e ingresa a http://localhost:3000/auth/register.
 Regístrate en la aplicación siguiendo las instrucciones en pantalla.
